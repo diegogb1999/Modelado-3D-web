@@ -1,49 +1,20 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import Componente1 from './components/Componente1.jsx'
+import "./styles.css";
+import { Canvas } from "@react-three/fiber";
+import { useLoader } from "@react-three/fiber";
+import { Environment, OrbitControls } from "@react-three/drei";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { Suspense } from "react";
+import Modelado3D from "./components/Modelo3D";
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  useEffect(() => { console.log("hola") } , [count])
-
-  const array = [ "Diego", "David", "Sergio" ]
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    return (
+      <div className="flex justify-center items-center h-screen w-screen">
+        <Modelado3D />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+  );
 
-        
-
-      <div className={`${count > 5 ? "text-red-500" : "text-green-500"}`}>
-
-        { array.map((item, indice) => (
-         <Componente1 nombre={item} key={item}/>
-        )) }
-      </div>
-
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
 }
 
 export default App
