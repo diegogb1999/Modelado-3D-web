@@ -1,26 +1,91 @@
-import React, { Component, useState, useEffect, useRef } from "react";
+import React, { Component, useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { DirectionalLight, PointLight, MeshStandardMaterial, Box3, BoxHelper } from 'three';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
+import './Modelo3D.css';
+import gsap from "gsap";
+import { Debug } from "@react-three/cannon";
+//import CCapture from "ccapture.js";
 
 const Modelado3D = () => {
 
   const [sliderValue, setSliderValue] = useState(50);
 
+  const sceneComponentRef = useRef();
+
+  // const handleAnimate = () => {
+  //   if (sceneComponentRef.current) {
+  //     sceneComponentRef.current.animateKeyframes();
+  //   }
+  // };
+
+  // const handleSave = (type) => {
+  //   if (sceneComponentRef.current) {
+  //     sceneComponentRef.current.saveKeyframe(type);
+  //   }
+  // };
+
+  // const handleStartRecording = () => {
+  //   if (sceneComponentRef.current) {
+  //     sceneComponentRef.current.startRecording();
+  //   }
+  // };
+
   const handleSliderChange = (event) => {
     setSliderValue(Number(event.target.value));
+  };
 
-    
+  //const streamRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const chunks = [];
+
+  useEffect(() => {
+    const canvas = document.querySelector('canvas');
+    const stream = canvas.captureStream(25);
+    mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'animation.webm';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    };
+
+    return () => {
+      mediaRecorderRef.current = null;
+    };
+  }, []);
+
+  const startRecording = () => {
+    mediaRecorderRef.current.start();
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current.stop();
   };
 
   return (
     <div>
-      <Canvas style={{ width: '100vw', height: '100vh' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
-        <SceneComponent setSliderValue={setSliderValue} sliderValue={sliderValue} />
+      <Canvas style={{ width: '100vw', height: '700px' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
+        <SceneComponent ref={sceneComponentRef} setSliderValue={setSliderValue} sliderValue={sliderValue} />
       </Canvas>
       <div style={{ position: 'absolute', top: '10px', left: '800px' }}>
-        <button onClick={() => saveKeyframe('start')}>Guardar Keyframe Inicial</button>
-        <button onClick={() => saveKeyframe('end')}>Guardar Keyframe Final</button>
+        {/* <button className = "boton" onClick={() => handleSave('start')}>Guardar Keyframe Inicial</button>
+        <button className = "boton" onClick={() => handleSave('end')}>Guardar Keyframe Final</button> */}
+        <button className = "boton" onClick={startRecording}>Start Recording</button>
+      <button className = "boton" onClick={stopRecording}>Stop Recording</button>
       </div>
       <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
         <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} style={{ width: '300px', height: '25px' }} />
@@ -30,9 +95,72 @@ const Modelado3D = () => {
   );
 };
 
-const SceneComponent = ({ setSliderValue, sliderValue }) => {
+const SceneComponent = forwardRef(({ setSliderValue, sliderValue }, ref) => {
+
+  // const animateKeyframes = () => {
+  //   //console.log("hola")
+  //   // Usar una librería como GSAP para animar entre los estados guardados
+  //   gsap.to(nut.position, {
+  //     z: keyframes.end.positionZ,
+  //     duration: 2,
+  //     ease: "linear"
+  //   });
+  //   gsap.to(nut.rotation, {
+  //     z: keyframes.end.rotationZ,
+  //     duration: 2,
+  //     ease: "linear"
+  //   });
+  // };
 
   const { scene, nodes } = useGLTF('../../Screw_Nut.gltf');
+
+  // const [keyframes, setKeyframes] = useState({
+  //   start: { positionZ: null, rotationZ: null },
+  //   end: { positionZ: null, rotationZ: null }
+  // });
+
+  // const saveKeyframe = (type) => {
+
+  //   console.log("Animando keyframes");
+  //   const newState = {
+  //     positionZ: nut.position.z,
+  //     rotationZ: nut.rotation.z
+  //   };
+  //   setKeyframes(prevState => ({
+  //     ...prevState,
+  //     [type]: newState
+  //   }));
+  // };
+
+  // const startRecording = () => {
+  //   const capturer = new CCapture({
+  //     format: 'webm',
+  //     framerate: 30,
+  //     verbose: true
+  //   });
+
+  //   capturer.start();
+
+  //   // Suponiendo que tienes una función que actualiza tu escena
+  //   function render() {
+  //     requestAnimationFrame(render);
+  //     capturer.capture(canvas);
+  //   }
+
+  //   render();
+
+  //   // Supongamos que stopRecording() se llama después de cierto tiempo o evento
+  //   setTimeout(() => {
+  //     capturer.stop();
+  //     capturer.save();
+  //   }, 4000); // Duración de la grabación en milisegundos
+  // };
+
+  // useImperativeHandle(ref, () => ({
+  //   animateKeyframes,
+  //   saveKeyframe,
+  //   startRecording
+  // }));
 
   const circle = nodes.Object_57002;
   const nut = nodes.bolts1002;
@@ -99,6 +227,6 @@ const SceneComponent = ({ setSliderValue, sliderValue }) => {
       <primitive object={scene} scale={1} />
     </>
   );
-};
+});
 
 export default Modelado3D;
