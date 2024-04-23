@@ -10,63 +10,44 @@ import { Debug } from "@react-three/cannon";
 const Modelado3D = () => {
 
   const [sliderValue, setSliderValue] = useState(50);
-
+  const canvasRef = useRef();  // Create a ref for the canvas
   const sceneComponentRef = useRef();
+  const mediaRecorderRef = useRef(null);
+  const chunks = [];
 
-  // const handleAnimate = () => {
-  //   if (sceneComponentRef.current) {
-  //     sceneComponentRef.current.animateKeyframes();
-  //   }
-  // };
+  const [keyframes, setKeyframes] = useState({
+    start: { positionZ: null, rotationZ: null },
+    end: { positionZ: null, rotationZ: null }
+  });
+  const [playAnimation, setPlayAnimation] = useState(false);
 
-  // const handleSave = (type) => {
-  //   if (sceneComponentRef.current) {
-  //     sceneComponentRef.current.saveKeyframe(type);
-  //   }
-  // };
+// Manejadores para los botones
+const handleSaveStart = () => {
+  if (sceneComponentRef.current && sceneComponentRef.current.saveKeyframe) {
+    sceneComponentRef.current.saveKeyframe('start', sliderValue);
+    console.log('Save Start:', sliderValue); // Verificar que el botón está funcionando
+  }
+};
 
-  // const handleStartRecording = () => {
-  //   if (sceneComponentRef.current) {
-  //     sceneComponentRef.current.startRecording();
-  //   }
-  // };
+const handleSaveEnd = () => {
+  if (sceneComponentRef.current && sceneComponentRef.current.saveKeyframe) {
+    sceneComponentRef.current.saveKeyframe('end', sliderValue);
+    console.log('Save End:', sliderValue); // Verificar que el botón está funcionando
+  }
+};
+
+const handlePlayAnimation = () => {
+  console.log('Play Animation:', keyframes); // Verificar los keyframes antes de animar
+  setPlayAnimation(true);
+  if (sceneComponentRef.current && sceneComponentRef.current.animateKeyframes) {
+    sceneComponentRef.current.animateKeyframes();
+  }
+  setTimeout(() => setPlayAnimation(false), 2000);
+};
 
   const handleSliderChange = (event) => {
     setSliderValue(Number(event.target.value));
   };
-
-  //const streamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const chunks = [];
-
-  useEffect(() => {
-    const canvas = document.querySelector('canvas');
-    const stream = canvas.captureStream(25);
-    mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunks.push(event.data);
-      }
-    };
-
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'animation.webm';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    };
-
-    return () => {
-      mediaRecorderRef.current = null;
-    };
-  }, []);
 
   const startRecording = () => {
     mediaRecorderRef.current.start();
@@ -76,14 +57,47 @@ const Modelado3D = () => {
     mediaRecorderRef.current.stop();
   };
 
+  useEffect(() => {
+    if (canvasRef.current) {
+      const stream = canvasRef.current.captureStream(25);
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'animation.webm';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      };
+    }
+
+    return () => {
+      mediaRecorderRef.current = null;
+    };
+  }, []);
+
   return (
     <div>
-      <Canvas style={{ width: '100vw', height: '700px' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
-        <SceneComponent ref={sceneComponentRef} setSliderValue={setSliderValue} sliderValue={sliderValue} />
+      <Canvas ref={canvasRef} style={{ width: '100vw', height: '700px' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
+        <SceneComponent ref={sceneComponentRef} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
+  setKeyframes={setKeyframes} // Asegúrate de que esto está siendo pasado correctamente
+  playAnimation={playAnimation} />
       </Canvas>
       <div style={{ position: 'absolute', top: '10px', left: '800px' }}>
-        {/* <button className = "boton" onClick={() => handleSave('start')}>Guardar Keyframe Inicial</button>
-        <button className = "boton" onClick={() => handleSave('end')}>Guardar Keyframe Final</button> */}
+      <button className= "boton" onClick={handleSaveStart}>Guardar Keyframe Inicial</button>
+      <button className= "boton" onClick={handleSaveEnd}>Guardar Keyframe Final</button>
+      <button className= "boton" onClick={handlePlayAnimation}>Reproducir Animación</button>
         <button className = "boton" onClick={startRecording}>Start Recording</button>
       <button className = "boton" onClick={stopRecording}>Stop Recording</button>
       </div>
@@ -95,72 +109,9 @@ const Modelado3D = () => {
   );
 };
 
-const SceneComponent = forwardRef(({ setSliderValue, sliderValue }, ref) => {
-
-  // const animateKeyframes = () => {
-  //   //console.log("hola")
-  //   // Usar una librería como GSAP para animar entre los estados guardados
-  //   gsap.to(nut.position, {
-  //     z: keyframes.end.positionZ,
-  //     duration: 2,
-  //     ease: "linear"
-  //   });
-  //   gsap.to(nut.rotation, {
-  //     z: keyframes.end.rotationZ,
-  //     duration: 2,
-  //     ease: "linear"
-  //   });
-  // };
+const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, setKeyframes, playAnimation }, ref) => {
 
   const { scene, nodes } = useGLTF('../../Screw_Nut.gltf');
-
-  // const [keyframes, setKeyframes] = useState({
-  //   start: { positionZ: null, rotationZ: null },
-  //   end: { positionZ: null, rotationZ: null }
-  // });
-
-  // const saveKeyframe = (type) => {
-
-  //   console.log("Animando keyframes");
-  //   const newState = {
-  //     positionZ: nut.position.z,
-  //     rotationZ: nut.rotation.z
-  //   };
-  //   setKeyframes(prevState => ({
-  //     ...prevState,
-  //     [type]: newState
-  //   }));
-  // };
-
-  // const startRecording = () => {
-  //   const capturer = new CCapture({
-  //     format: 'webm',
-  //     framerate: 30,
-  //     verbose: true
-  //   });
-
-  //   capturer.start();
-
-  //   // Suponiendo que tienes una función que actualiza tu escena
-  //   function render() {
-  //     requestAnimationFrame(render);
-  //     capturer.capture(canvas);
-  //   }
-
-  //   render();
-
-  //   // Supongamos que stopRecording() se llama después de cierto tiempo o evento
-  //   setTimeout(() => {
-  //     capturer.stop();
-  //     capturer.save();
-  //   }, 4000); // Duración de la grabación en milisegundos
-  // };
-
-  // useImperativeHandle(ref, () => ({
-  //   animateKeyframes,
-  //   saveKeyframe,
-  //   startRecording
-  // }));
 
   const circle = nodes.Object_57002;
   const nut = nodes.bolts1002;
@@ -169,8 +120,75 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue }, ref) => {
   const nutBox = new Box3().setFromObject(nut);
   const screwBox = new Box3().setFromObject(screw);
 
-  // const nutHelper = useRef(nut);
-  // const screwHelper = useRef(screw);
+  const saveKeyframe = (type) => {
+    const newState = {
+      positionZ: nut.position.z,
+      rotationZ: nut.rotation.z
+    };
+    setKeyframes(prevState => ({
+      ...prevState,
+      [type]: newState
+    }));
+  };
+
+  const animateKeyframes = () => {
+    gsap.to(nut.position, {
+      z: keyframes.end.positionZ,
+      duration: 2,
+      ease: "linear"
+    });
+    gsap.to(nut.rotation, {
+      z: keyframes.end.rotationZ,
+      duration: 2,
+      ease: "linear"
+    });
+  };
+
+  useImperativeHandle(ref, () => ({
+    saveKeyframe: (type, value) => {
+      const scale = value / 250;
+      const positionZ = scale * 3 - 1; // Esto calcula la nueva posición Z basada en el slider
+      const rotationZ = scale * Math.PI * 3; // Esto calcula la nueva rotación Z basada en el slider
+      
+
+      const newState = {
+        positionZ: positionZ,
+      rotationZ: rotationZ
+      };
+  
+      setKeyframes(prevState => ({
+        ...prevState,
+        [type]: newState
+      }));
+    },
+    animateKeyframes: () => {
+      if (keyframes.start && keyframes.end) {
+        console.log('Animating from:', keyframes.start, 'to', keyframes.end);
+        
+        gsap.fromTo(nut.position,
+          { z: keyframes.start.positionZ }, 
+          {
+            z: keyframes.end.positionZ,
+            duration: 2,
+            ease: "linear"
+          }
+        );
+        gsap.fromTo(nut.rotation, 
+          { z: keyframes.start.rotationZ }, 
+          {
+            z: keyframes.end.rotationZ,
+            duration: 2,
+            ease: "linear"
+          }
+        );
+      }
+    }
+  }));
+
+  // onUpdate: function() {
+  //   // Esto puede ayudar a forzar la actualización de la posición durante la animación
+  //   nut.position.z = this.targets()[0].z;
+  // }
 
   const rotateNut = (direction) => {
     const delta = 0.05;
@@ -186,35 +204,15 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue }, ref) => {
     }
   };
 
-  // useEffect(() => {
-  //   nutHelper.current = new BoxHelper(nut, 0xff0000);
-  //   screwHelper.current = new BoxHelper(screw, 0x00ff00);
-
-  //   scene.add(nutHelper.current);
-  //   scene.add(screwHelper.current);
-
-  //   return () => {
-  //     scene.remove(nutHelper.current);
-  //     scene.remove(screwHelper.current);
-  //   };
-  // }, [scene, nut, screw]);
-
   useFrame(() => {
-    const scale = sliderValue / 250;
-    const newPositionZ = scale * 3 - 1;
-    const newRotationZ = scale * Math.PI * 3;
-
-    // Actualizar posición de la tuerca basado en el slider
-    nut.position.z = newPositionZ;
-    nut.rotation.z = newRotationZ;
-
-    // // Actualizar los BoxHelpers
-    // nutHelper.current.update();
-    // screwHelper.current.update();
-
-    // Actualizar la envolvente delimitadora de la tuerca
+    if (!playAnimation) {
+      const scale = sliderValue / 250;
+      const newPositionZ = scale * 3 - 1;
+      const newRotationZ = scale * Math.PI * 3;
+      nut.position.z = newPositionZ;
+      nut.rotation.z = newRotationZ;
+    }
     nutBox.setFromObject(nut);
-
 
   });
 
