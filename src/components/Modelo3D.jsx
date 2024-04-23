@@ -10,8 +10,10 @@ import { Debug } from "@react-three/cannon";
 const Modelado3D = () => {
 
   const [sliderValue, setSliderValue] = useState(50);
-
+  const canvasRef = useRef();  // Create a ref for the canvas
   const sceneComponentRef = useRef();
+  const mediaRecorderRef = useRef(null);
+  const chunks = [];
 
   // const handleAnimate = () => {
   //   if (sceneComponentRef.current) {
@@ -31,37 +33,37 @@ const Modelado3D = () => {
   //   }
   // };
 
+  //const streamRef = useRef(null);
+
+
   const handleSliderChange = (event) => {
     setSliderValue(Number(event.target.value));
   };
 
-  //const streamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const chunks = [];
-
   useEffect(() => {
-    const canvas = document.querySelector('canvas');
-    const stream = canvas.captureStream(25);
-    mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    if (canvasRef.current) {
+      const stream = canvasRef.current.captureStream(25);
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunks.push(event.data);
-      }
-    };
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
 
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'animation.webm';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    };
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'animation.webm';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      };
+    }
 
     return () => {
       mediaRecorderRef.current = null;
@@ -78,7 +80,7 @@ const Modelado3D = () => {
 
   return (
     <div>
-      <Canvas style={{ width: '100vw', height: '700px' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
+      <Canvas ref={canvasRef} style={{ width: '100vw', height: '700px' }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
         <SceneComponent ref={sceneComponentRef} setSliderValue={setSliderValue} sliderValue={sliderValue} />
       </Canvas>
       <div style={{ position: 'absolute', top: '10px', left: '800px' }}>
