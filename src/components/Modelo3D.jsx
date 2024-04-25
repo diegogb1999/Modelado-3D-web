@@ -2,6 +2,7 @@ import React, { Component, useState, useEffect, useRef, forwardRef, useImperativ
 import { DirectionalLight, PointLight, MeshStandardMaterial, Box3, BoxHelper } from 'three';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
+import { EffectComposer, Outline } from '@react-three/postprocessing';
 import './Modelo3D.css';
 import gsap from "gsap";
 import { Debug } from "@react-three/cannon";
@@ -41,6 +42,10 @@ const Modelado3D = () => {
     end: { positionZ: null, rotationZ: null }
   });
   const [playAnimation, setPlayAnimation] = useState(false);
+
+  const handleNodesLoaded = (names) => {
+    setNodeNames(names);
+  };
 
   // Manejadores para los botones
   const handleSaveStart = () => {
@@ -143,9 +148,20 @@ const Modelado3D = () => {
 
         <div className="canvas">
           <Canvas ref={canvasRef} style={{ width: '1500px', height: '700px', background: "black" }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
-            <SceneComponent ref={sceneComponentRef} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
+            <SceneComponent ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
               setKeyframes={setKeyframes}
               playAnimation={playAnimation} />
+              <EffectComposer>
+        <Outline
+          kernelSize={1} // You can adjust the size of the outline effect
+          visibleEdgeColor="white"
+          hiddenEdgeColor="black"
+          edgeStrength={10}
+          pulsePeriod={1}
+          height={480}
+          width={640}
+        />
+      </EffectComposer>
           </Canvas>
         </div>
 
@@ -162,7 +178,7 @@ const Modelado3D = () => {
   );
 };
 
-const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, setKeyframes, playAnimation }, ref) => {
+const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, setKeyframes, playAnimation, onNodesLoaded }, ref) => {
 
   const { scene, nodes } = useGLTF('../../Screw_Nut.gltf');
 
@@ -283,6 +299,12 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
       nut.rotation.z -= deltaRotation;
     }
   };
+
+  useEffect(() => {
+    if (Object.keys(nodes).length > 0 && onNodesLoaded) {
+      onNodesLoaded(Object.keys(nodes));
+    }
+  }, [nodes, onNodesLoaded]);
 
   useFrame(() => {
     if (!playAnimation) {
