@@ -7,38 +7,56 @@
    text-decoration: none;
    display: inline-block;
    font-size: 16px;
-   margin: 10px;
+   margin-bottom: 30px;
  }
 
- .slider 
- {
-  margin-left: 10px;
-  margin-right: 10px;
+ .slider {
+   margin-top: 30px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
  }
 
  .nodosCanvas {
-  display: flex;
-  flex-direction: row;
-  gap: 100px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
- }
- .canvas {
-  flex-grow: 1;
+   display: flex;
+   flex-direction: row;
+   gap: 100px;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-items: center;
+   align-content: center;
  }
 
  .prueba {
-  color: #04AA6D;
- }
-
- .pantalla { 
-  display: block;
+   color: #04AA6D;
  }
 
  .selected {
-  color: rgb(101, 0, 114);
-  font-size: 30px;
-  font-weight: 600;
+   color: rgb(101, 0, 114);
+   font-size: 30px;
+   font-weight: 600;
+ }
+
+ .pantalla {
+   display: block;
+ }
+
+ .inputs {
+   display: flex;
+   flex-direction: row;
+   gap: 50px;
+   align-items: center;
+   align-content: center;
+   justify-content: center;
+ }
+
+ .botones {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: space-around;
+   text-align: center;
+
  }

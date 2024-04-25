@@ -12,15 +12,16 @@ function NodeSelection({ nodeNames, onSelectNode, selectedNode }) {
   return (
     <div>
       {nodeNames.map(name => (
-        <button key={name} onClick={() => onSelectNode(name)} style={{ display: 'block', margin: '5px' }}>
+        <button key={name} onClick={() => onSelectNode(name)} style={{ display: 'block', margin: '5px', color: "black", fontSize: "30px" }}>
           {name}
         </button>
       ))}
       {selectedNode && <div className="selected">
-        <span>---------------</span>
+        <br></br>
+        <br></br>
         <br></br>
         {selectedNode.name}
-        </div>}
+      </div>}
     </div>
   );
 }
@@ -130,7 +131,7 @@ const Modelado3D = () => {
   return (
     <div className="pantalla">
 
-      <div style={{ position: 'absolute', top: '0px', left: '0px' }}>
+      <div className="botones">
 
         <button className="boton" onClick={handleSaveStart}>Guardar Keyframe Inicial</button>
         <button className="boton" onClick={handleSaveEnd}>Guardar Keyframe Final</button>
@@ -151,15 +152,21 @@ const Modelado3D = () => {
             <SceneComponent ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
               setKeyframes={setKeyframes}
               playAnimation={playAnimation} />
+
           </Canvas>
+
         </div>
 
       </div>
 
-      <div className="slider">
+      <div className="inputs">
 
-        <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} style={{ width: '300px', height: '25px' }} />
-        <span>Valor del Slider: {sliderValue}</span>
+        <div className="slider">
+
+          <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} style={{ width: '300px', height: '25px' }} />
+          <span>Valor del Slider: {sliderValue}</span>
+
+        </div>
 
       </div>
 
@@ -177,18 +184,38 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
 
   const nutBox = new Box3().setFromObject(nut);
   const screwBox = new Box3().setFromObject(screw);
-
+  const [outlineObjects, setOutlineObjects] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [originalMaterial, setOriginalMaterial] = useState(null);
+
+  // const convertNodeToMesh = (node) => {
+  //   if (node.isObject3D && node.geometry && !node.isMesh) {
+  //     const material = new THREE.MeshStandardMaterial({
+  //       color: 0x777777, // color gris inicial
+  //       metalness: 0.5,
+  //       roughness: 0.5
+  //     });
+  //     const mesh = new THREE.Mesh(node.geometry, material);
+  //     node.add(mesh); // Convierte el nodo en una malla y lo agrega como hijo
+  //   }
+  // };
+
   const handleSelectNode = nodeName => {
     const node = nodes[nodeName];
-    if (selectedNode && selectedNode !== node) {
-      // Restaurar la escala original si el nodo previamente seleccionado no es el mismo que el nuevo
-      selectedNode.scale.set(1, 1, 1); // Asumiendo que la escala original es 1,1,1
+    // Restablecer el nodo previamente seleccionado a su material original
+    if (selectedNode && originalMaterial) {
+      selectedNode.material = originalMaterial;
     }
-    if (node) {
-      node.scale.set(1.5, 1.5, 1.5); // Aumenta la escala en 50%
-      setSelectedNode(node);
+    // Clonar el material antes de modificarlo
+    if (node.material && node.material.isMaterial) {
+      setOriginalMaterial(node.material.clone()); // Guarda el material original antes de clonar
+      node.material = node.material.clone();
+      node.material.color.set(0xff0000); // Cambia el color al rojo
+    } else {
+      node.material = new MeshStandardMaterial({ color: 0xff0000 });
+      setOriginalMaterial(node.material); // No había material previo, así que usamos el nuevo
     }
+    setSelectedNode(node);
   };
 
 
@@ -220,11 +247,7 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
 
     getNodesNames: () => Object.keys(nodes), // Función para obtener los nombres de los nodos
 
-    handleSelectNode: nodeName => { // Función para manejar la selección de un nodo
-      const node = nodes[nodeName];
-  
-      setSelectedNode(node);
-    },
+    handleSelectNode,
 
     getSelectedNode: () => selectedNode,
 
@@ -284,6 +307,9 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
   };
 
   useEffect(() => {
+    Object.keys(nodes).forEach(key => {
+      //convertNodeToMesh(nodes[key]);
+    });
     if (Object.keys(nodes).length > 0 && onNodesLoaded) {
       onNodesLoaded(Object.keys(nodes));
     }
