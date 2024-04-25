@@ -125,7 +125,7 @@ const Modelado3D = () => {
     return () => {
       mediaRecorderRef.current = null;
     };
-  }, [sceneComponentRef.current]);
+  }, []);
 
   return (
     <div className="pantalla">
@@ -151,17 +151,6 @@ const Modelado3D = () => {
             <SceneComponent ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
               setKeyframes={setKeyframes}
               playAnimation={playAnimation} />
-              <EffectComposer>
-        <Outline
-          kernelSize={1} // You can adjust the size of the outline effect
-          visibleEdgeColor="white"
-          hiddenEdgeColor="black"
-          edgeStrength={10}
-          pulsePeriod={1}
-          height={480}
-          width={640}
-        />
-      </EffectComposer>
           </Canvas>
         </div>
 
@@ -192,12 +181,14 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
   const [selectedNode, setSelectedNode] = useState(null);
   const handleSelectNode = nodeName => {
     const node = nodes[nodeName];
-    if (selectedNode) {
-      // Restaurar material previo si es necesario
+    if (selectedNode && selectedNode !== node) {
+      // Restaurar la escala original si el nodo previamente seleccionado no es el mismo que el nuevo
+      selectedNode.scale.set(1, 1, 1); // Asumiendo que la escala original es 1,1,1
     }
-    // Actualizar el material para resaltar el nodo seleccionado
-    setSelectedNode(node);
-    // Más lógica si necesitas actualizar algo más al seleccionar
+    if (node) {
+      node.scale.set(1.5, 1.5, 1.5); // Aumenta la escala en 50%
+      setSelectedNode(node);
+    }
   };
 
 
@@ -231,10 +222,7 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
 
     handleSelectNode: nodeName => { // Función para manejar la selección de un nodo
       const node = nodes[nodeName];
-      if (selectedNode) {
-        // Aquí puedes restablecer el estado visual anterior del nodo si es necesario
-      }
-      // Actualiza el material para resaltar el nodo seleccionado o cualquier otra lógica necesaria
+  
       setSelectedNode(node);
     },
 
@@ -280,11 +268,6 @@ const SceneComponent = forwardRef(({ setSliderValue, sliderValue, keyframes, set
       }
     }
   }));
-
-  // onUpdate: function() {
-  //   // Esto puede ayudar a forzar la actualización de la posición durante la animación
-  //   nut.position.z = this.targets()[0].z;
-  // }
 
   const rotateNut = (direction) => {
     const delta = 0.05;
