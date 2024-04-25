@@ -9,3 +9,36 @@
    font-size: 16px;
    margin: 10px;
  }
+
+ .slider 
+ {
+  margin-left: 10px;
+  margin-right: 10px;
+ }
+
+ .nodosCanvas {
+  display: flex;
+  flex-direction: row;
+  gap: 100px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+ }
+ .canvas {
+  flex-grow: 1;
+ }
+
+ .prueba {
+  color: #04AA6D;
+ }
+
+ .pantalla { 
+  display: block;
+ }
+
+ .selected {
+  color: rgb(101, 0, 114);
+  font-size: 30px;
+  font-weight: 600;
+ }
