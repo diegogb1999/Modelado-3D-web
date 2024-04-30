@@ -2,6 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 //Three.js
 import { Canvas } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+
+import { MeshStandardMaterial } from "three";
 //Components
 import NodeSelection from "./NodeSelection";
 import Scene from "./Scene";
@@ -26,6 +29,20 @@ const Modelado3D = () => {
     start: { positionZ: null, rotationZ: null },
     end: { positionZ: null, rotationZ: null },
   });
+
+  const [originalMaterial, setOriginalMaterial] = useState(null);
+
+  const { scene, nodes } = useGLTF("../../Screw_Nut.gltf");
+
+  handleSelectNode(
+    nodes,
+    nodeName,
+    selectedNode,
+    setSelectedNode,
+    originalMaterial,
+    setOriginalMaterial,
+    MeshStandardMaterial
+  );
 
   //Refs
   const canvasRef = useRef();
@@ -163,6 +180,11 @@ const Modelado3D = () => {
               keyframes={keyframes}
               setKeyframes={setKeyframes}
               playAnimation={playAnimation}
+              selectedNode={selectedNode}
+              setSelectedNode={setSelectedNode}
+              originalMaterial={originalMaterial}
+              setOriginalMaterial={setOriginalMaterial}
+              nodes={nodes}
             />
           </Canvas>
         </div>

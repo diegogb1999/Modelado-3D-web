@@ -1,7 +1,6 @@
 //Hooks
 import { useState, useEffect } from "react";
 //Three.js
-import { MeshStandardMaterial } from "three";
 import { useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 //Gsap
@@ -21,15 +20,15 @@ export default function Scene({
   setKeyframes,
   playAnimation,
   onNodesLoaded,
+  selectedNode,
+  setSelectedNode,
+  originalMaterial,
+  setOriginalMaterial,
+  nodes,
 }) {
-  const { scene, nodes } = useGLTF("../../Screw_Nut.gltf");
-
   const nut = nodes.bolts1002;
   //const circle = nodes.Object_57002;
   //const screw = nodes.Object_57005;
-
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [originalMaterial, setOriginalMaterial] = useState(null);
 
   useEffect(() => {
     if (Object.keys(nodes).length > 0 && onNodesLoaded) {
