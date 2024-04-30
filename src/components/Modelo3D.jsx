@@ -34,16 +34,6 @@ const Modelado3D = () => {
 
   const { scene, nodes } = useGLTF("../../Screw_Nut.gltf");
 
-  handleSelectNode(
-    nodes,
-    nodeName,
-    selectedNode,
-    setSelectedNode,
-    originalMaterial,
-    setOriginalMaterial,
-    MeshStandardMaterial
-  );
-
   //Refs
   const canvasRef = useRef();
   const sceneComponentRef = useRef();
