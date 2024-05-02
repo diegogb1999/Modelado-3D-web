@@ -1,5 +1,4 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
-import { MeshStandardMaterial } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import gsap from "gsap";
@@ -24,13 +23,10 @@ const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation,
             selectedNode.material = originalMaterial;
         }
         
-        if (node.material && node.material.isMaterial) {
+        if (node.material) {
             setOriginalMaterial(node.material.clone());
             node.material = node.material.clone();
             node.material.color.set(0xff0000);
-        } else {
-            node.material = new MeshStandardMaterial({ color: 0xff0000 });
-            setOriginalMaterial(node.material);
         }
         setSelectedNode(node);
     };

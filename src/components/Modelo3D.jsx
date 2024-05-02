@@ -12,7 +12,7 @@ const Modelado3D = () => {
   const mediaRecorderRef = useRef(null);
   const chunks = [];
 
-  const [sliderValue, setSliderValue] = useState(50);
+  const [sliderValue, setSliderValue] = useState(22);
   const [nodeNames, setNodeNames] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(false);
@@ -27,22 +27,16 @@ const Modelado3D = () => {
   };
 
   const handleSaveStart = () => {
-    if (sceneComponentRef.current && sceneComponentRef.current.saveKeyframe) {
       sceneComponentRef.current.saveKeyframe('start', sliderValue);
-    }
   };
 
   const handleSaveEnd = () => {
-    if (sceneComponentRef.current && sceneComponentRef.current.saveKeyframe) {
       sceneComponentRef.current.saveKeyframe('end', sliderValue);
-    }
   };
 
   const handlePlayAnimation = () => {
     setPlayAnimation(true);
-    if (sceneComponentRef.current && sceneComponentRef.current.animateKeyframes) {
-      sceneComponentRef.current.animateKeyframes();
-    }
+    sceneComponentRef.current.animateKeyframes();
     setTimeout(() => setPlayAnimation(false), 2000);
   };
 
