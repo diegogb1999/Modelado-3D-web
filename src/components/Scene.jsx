@@ -4,11 +4,11 @@ import { OrbitControls, useGLTF } from '@react-three/drei';
 import gsap from "gsap";
 
 
-const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation, onNodesLoaded }, ref) => {
+const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation, onNodesLoaded, setSliderValue }, ref) => {
 
     const { scene, nodes } = useGLTF('../../Screw_Nut.gltf');
 
-    const nut = nodes.bolts1002;
+    //const nut = nodes.bolts1002;
     //const circle = nodes.Object_57002;
     //const screw = nodes.Object_57005;
 
@@ -22,15 +22,21 @@ const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation,
         if (selectedNode && originalMaterial) {
             selectedNode.material = originalMaterial;
         }
-        
+
         if (node.material) {
             setOriginalMaterial(node.material.clone());
             node.material = node.material.clone();
             node.material.color.set(0xff0000);
         }
         setSelectedNode(node);
+
+        const newSliderValue = positionToSliderValue(node.position.z);
+        setSliderValue(newSliderValue);
     };
 
+    const positionToSliderValue = (positionZ) => {
+        return (positionZ + 1) / 3 * 250;
+    };
 
     useImperativeHandle(ref, () => ({
 
@@ -40,46 +46,51 @@ const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation,
 
         getSelectedNode: () => selectedNode,
 
-        saveKeyframe: (type, value) => {
-            const scale = value / 250;
-            const positionZ = scale * 3 - 1;
-            const rotationZ = scale * Math.PI * 3;
+        saveKeyframe: (type) => {
+            Object.keys(nodes).forEach(nodeName => {
+                const node = nodes[nodeName];
 
+                const positionZ = node.position.z;
+                const rotationZ = node.rotation.z;
 
-            const newState = {
-                positionZ: positionZ,
-                rotationZ: rotationZ
-            };
+                const newState = {
+                    positionZ: positionZ,
+                    rotationZ: rotationZ
+                };
 
-
-            setKeyframes(prevState => ({
-                ...prevState,
-                [type]: newState
-            }));
+                setKeyframes(prevState => ({
+                    ...prevState,
+                    [nodeName]: {
+                        ...prevState[nodeName],
+                        [type]: newState
+                    }
+                }));
+            });
         },
-        
-        animateKeyframes: () => {
-            if (keyframes.start && keyframes.end) {
-                console.log('Animating from:', keyframes.start, 'to', keyframes.end);
 
-                gsap.fromTo(nut.position,
-                    { z: keyframes.start.positionZ },
-                    {
-                        z: keyframes.end.positionZ,
-                        duration: 2,
-                        ease: "linear"
-                    }
-                );
-                gsap.fromTo(nut.rotation,
-                    { z: keyframes.start.rotationZ },
-                    {
-                        z: keyframes.end.rotationZ,
-                        duration: 2,
-                        ease: "linear"
-                    }
-                );
-            }
-        }
+        animateKeyframes: () => {
+            Object.entries(keyframes).forEach(([nodeName, nodeKeyframes]) => {
+                if (nodeKeyframes.start && nodeKeyframes.end) {
+                    const node = nodes[nodeName];
+                    gsap.fromTo(node.position,
+                        { z: nodeKeyframes.start.positionZ },
+                        {
+                            z: nodeKeyframes.end.positionZ,
+                            duration: 2,
+                            ease: "linear"
+                        }
+                    );
+                    gsap.fromTo(node.rotation,
+                        { z: nodeKeyframes.start.rotationZ },
+                        {
+                            z: nodeKeyframes.end.rotationZ,
+                            duration: 2,
+                            ease: "linear"
+                        }
+                    );
+                }
+            });
+        },
     }));
 
 
@@ -91,12 +102,13 @@ const Scene = forwardRef(({ sliderValue, keyframes, setKeyframes, playAnimation,
 
 
     useFrame(() => {
-        if (!playAnimation) {
+        if (!playAnimation && selectedNode) {
+            const node = nodes[selectedNode.name];
             const scale = sliderValue / 250;
             const newPositionZ = scale * 3 - 1;
             const newRotationZ = scale * Math.PI * 3;
-            nut.position.z = newPositionZ;
-            nut.rotation.z = newRotationZ;
+            node.position.z = newPositionZ;
+            node.rotation.z = newRotationZ;
         }
     });
 
