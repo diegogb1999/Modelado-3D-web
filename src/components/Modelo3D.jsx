@@ -16,10 +16,7 @@ const Modelado3D = () => {
   const [nodeNames, setNodeNames] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(false);
-  const [keyframes, setKeyframes] = useState({
-    start: { positionZ: null, rotationZ: null },
-    end: { positionZ: null, rotationZ: null }
-  });
+  const [keyframes, setKeyframes] = useState({});
 
 
   const handleNodesLoaded = (names) => {
@@ -27,11 +24,11 @@ const Modelado3D = () => {
   };
 
   const handleSaveStart = () => {
-      sceneComponentRef.current.saveKeyframe('start', sliderValue);
+    sceneComponentRef.current.saveKeyframe('start');
   };
 
   const handleSaveEnd = () => {
-      sceneComponentRef.current.saveKeyframe('end', sliderValue);
+    sceneComponentRef.current.saveKeyframe('end');
   };
 
   const handlePlayAnimation = () => {
