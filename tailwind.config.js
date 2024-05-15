@@ -31,7 +31,8 @@ export default {
         "uktena-transparent": "rgba(0,0,0,0)",
         "uktena-dark-neutro": "#505050",
         "uktena-grey-medium": "rgba(245, 245, 245, 0.5)",
-        "uktena-black": "#000"
+        "uktena-black": "#000",
+        "uktena-purple-light-table": "rgb(240 241 255 / var(--tw-bg-opacity))",
       },
       screens: {
         sm: "640px",

@@ -1,5 +1,5 @@
 //Components
-import ButtonBigNoIconPrimary from "../buttons/big-no-icon/ButtonBigNoIconPrimary";
+//import ButtonBigNoIconPrimary from "../buttons/big-no-icon/ButtonBigNoIconPrimary";
 //import ButtonBigNoIconSecondary from "../buttons/big-no-icon/ButtonBigNoIconSecondary";
 //Redux
 import { useSelector } from "react-redux";
@@ -22,7 +22,7 @@ export default function ModalBackground({
   inlineInfo,
 }) {
   //Redux
-  const general = useSelector(selectGeneral);
+  const general = useSelector(false);
 
   return (
     <div

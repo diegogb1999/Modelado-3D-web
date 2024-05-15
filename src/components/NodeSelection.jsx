@@ -2,7 +2,7 @@ import React from "react";
 
 const NodeSelection = ({ nodeNames, onSelectNode, selectedNode }) => {
     return (
-        <div>
+        <div className="flex flex-col items-center w-full">
             {nodeNames.map(name => (
                 <button key={name} onClick={() => onSelectNode(name)} className="block m-2 text-black text-xl">
                     {name}
