@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Canvas } from '@react-three/fiber';
-import './Modelo3D.css';
 import NodeSelection from "./NodeSelection";
 import Scene from "./Scene";
+import ButtonSmallNoIconPrimary from '../importedComponents/ButtonSmallNoIconPrimary';
 
 
 const Modelado3D = () => {
@@ -95,44 +95,65 @@ const Modelado3D = () => {
 
 
   return (
-    <div className="pantalla">
+    <div className="h-screen w-screen bg-uktena-light-violet text-uktena-dark-neutro font-poppins">
 
-      <div className="botones">
-
-        <button className="boton" onClick={handleSaveStart}>Guardar Keyframe Inicial</button>
-        <button className="boton" onClick={handleSaveEnd}>Guardar Keyframe Final</button>
-        <button className="boton" onClick={handlePlayAnimation}>Reproducir Animación</button>
-        <button className="boton" onClick={startRecording}>Start Recording</button>
-        <button className="boton" onClick={stopRecording}>Stop Recording</button>
-
+      <div className="flex justify-around items-center h-[75px]">
+      <ButtonSmallNoIconPrimary
+          text="Guardar Keyframe Inicial"
+          setter={handleSaveStart}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Guardar Keyframe Final"
+          setter={handleSaveEnd}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Reproducir Animación"
+          setter={handlePlayAnimation}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Start Recording"
+          setter={startRecording}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Stop Recording"
+          setter={stopRecording}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
       </div>
 
-      <div className="nodosCanvas">
-
-        <div className="nodos">
+      <div className="flex flex-wrap justify-center items-center gap-24">
+        <div className="flex flex-col items-center">
           <NodeSelection nodeNames={nodeNames} onSelectNode={onSelectNode} selectedNode={selectedNode} />
         </div>
 
-        <div className="canvas">
-          <Canvas ref={canvasRef} style={{ width: '1500px', height: '700px', background: "black" }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
+        <div className="w-[1500px] h-[700px] bg-black">
+          <Canvas ref={canvasRef} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
             <Scene ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
               setKeyframes={setKeyframes}
               playAnimation={playAnimation} />
           </Canvas>
-
         </div>
-
       </div>
 
-      <div className="inputs">
-
-        <div className="slider">
-
-          <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} style={{ width: '300px', height: '25px' }} />
+      <div className="flex flex-row gap-12 items-center justify-center mt-8">
+        <div className="flex flex-col items-center">
+          <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} className="w-72 h-6" />
           <span>Valor del Slider: {sliderValue}</span>
-
         </div>
-
       </div>
 
     </div>

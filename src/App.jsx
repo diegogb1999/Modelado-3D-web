@@ -1,5 +1,5 @@
-import "./styles.css";
 import Modelado3D from "./components/Modelo3D";
+import "./index.css"
 
 
 function App() {
