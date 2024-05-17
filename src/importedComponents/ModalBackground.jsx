@@ -29,25 +29,21 @@ export default function ModalBackground({
       className={`fixed w-screen z-30 h-screen top-0 left-0 px-2 bg-uktena-dark-transparent flex justify-center items-center`}
     >
       <div
-        className={`bg-uktena-white ${width ? width : "w-full lg:w-[450px]"}  ${
-          rounded ? rounded : "rounded-[24px] "
-        } p-4 lg:p-6 flex flex-col ${gap ? gap : "gap-5"} ${
-          general ? "lg:ml-20" : "md:ml-60"
-        } text-uktena-dark-neutro`}
+        className={`bg-uktena-white ${width ? width : "w-full lg:w-[450px]"}  ${rounded ? rounded : "rounded-[24px] "
+          } p-4 lg:p-6 flex flex-col ${gap ? gap : "gap-5"} ${general ? "lg:ml-20" : "md:ml-60"
+          } text-uktena-dark-neutro`}
       >
         <div
-          className={`${
-            inlineInfo && "flex justify-between border-b border-uktena-01 pb-2"
-          }`}
+          className={`${inlineInfo && "flex justify-between border-b border-uktena-01 pb-2"
+            }`}
         >
           <h2 className="text-lg  font-semibold">{title}</h2>
           <p className="text-base font-semibold">{inlineInfo && inlineInfo}</p>
         </div>
         {children}
         <div
-          className={`flex gap-2 lg:justify-end ${
-            !inlineInfo && " border-t border-uktena-01"
-          } pt-2`}
+          className={`flex gap-2 lg:justify-end ${!inlineInfo && " border-t border-uktena-01"
+            } pt-2`}
         >
           <ButtonBigNoIconSecondary
             text={secondaryButtonText}

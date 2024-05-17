@@ -133,7 +133,7 @@ const Modelado3D = () => {
           fetching={false}
           width="w-auto"
         />
-        
+
       </div>
 
       <div className="h-full w-full flex justify-center">
@@ -158,7 +158,7 @@ const Modelado3D = () => {
           <div className="flex flex-row gap-12 items-center justify-center mt-10">
 
             <div className="flex flex-col items-center">
-              <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} className="w-72 h-6 accent-uktena-violet hover:bg-uktena-light-red"  />
+              <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} className="w-72 h-6 accent-uktena-violet hover:bg-uktena-light-red" />
               <span>Valor del Slider: {sliderValue}</span>
             </div>
 

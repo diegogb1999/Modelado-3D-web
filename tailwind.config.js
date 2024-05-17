@@ -14,8 +14,8 @@ export default {
         "uktena-transparent-violet": "#282B4880",
         "uktena-white": "#FFFFFF",
         "uktena-01": "#F0F0F0",
-         "uktena-02": "#DBDBDB",
-         "uktena-03": "#B1B1B1",
+        "uktena-02": "#DBDBDB",
+        "uktena-03": "#B1B1B1",
         "uktena-dark": "#393939",
         "uktena-dark-transparent": "rgba(57, 57, 57, 0.5)",
         "uktena-dark-transparent-01": "rgba(0, 0, 0, 0.6)",
@@ -48,5 +48,5 @@ export default {
     },
   },
   plugins: [],
-  
+
 }
