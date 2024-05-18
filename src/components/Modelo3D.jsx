@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Canvas } from '@react-three/fiber';
-import './Modelo3D.css';
 import NodeSelection from "./NodeSelection";
 import Scene from "./Scene";
-
+import ButtonSmallNoIconPrimary from '../importedComponents/ButtonSmallNoIconPrimary';
+import ModalBackground from '../importedComponents/ModalBackground';
 
 const Modelado3D = () => {
 
@@ -95,44 +95,76 @@ const Modelado3D = () => {
 
 
   return (
-    <div className="pantalla">
+    <div className="h-full w-full justify-center flex-col items-center flex flex-column gap-100">
 
-      <div className="botones">
-
-        <button className="boton" onClick={handleSaveStart}>Guardar Keyframe Inicial</button>
-        <button className="boton" onClick={handleSaveEnd}>Guardar Keyframe Final</button>
-        <button className="boton" onClick={handlePlayAnimation}>Reproducir Animación</button>
-        <button className="boton" onClick={startRecording}>Start Recording</button>
-        <button className="boton" onClick={stopRecording}>Stop Recording</button>
+      <div className="flex justify-around items-center w-full flex-wrap mb-5 mt-5 gap-5">
+        <ButtonSmallNoIconPrimary
+          text="Guardar Keyframe Inicial"
+          setter={handleSaveStart}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Guardar Keyframe Final"
+          setter={handleSaveEnd}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Reproducir Animación"
+          setter={handlePlayAnimation}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Start Recording"
+          setter={startRecording}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
+        <ButtonSmallNoIconPrimary
+          text="Stop Recording"
+          setter={stopRecording}
+          disabled={false}
+          fetching={false}
+          width="w-auto"
+        />
 
       </div>
 
-      <div className="nodosCanvas">
+      <div className="h-full w-full flex justify-center">
+        <div className="flex w-[95%] h-[95%] flex-col justify-center bg-uktena-white items-center pb-10 rounded-3xl">
 
-        <div className="nodos">
-          <NodeSelection nodeNames={nodeNames} onSelectNode={onSelectNode} selectedNode={selectedNode} />
+          <div className="flex w-[100%] h-[100%] flex-row justify-evenly items-center">
+
+            <div className="flex flex-col items-center justify-center">
+              <NodeSelection nodeNames={nodeNames} onSelectNode={onSelectNode} selectedNode={selectedNode} />
+            </div>
+
+            <div className="w-[70%] h-[90%] bg-uktena-purple-light-table rounded-3xl shadow-lg overflow-hidden">
+              <Canvas ref={canvasRef} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
+                <Scene ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
+                  setKeyframes={setKeyframes}
+                  playAnimation={playAnimation} />
+              </Canvas>
+            </div>
+
+          </div>
+
+          <div className="flex flex-row gap-12 items-center justify-center mt-10">
+
+            <div className="flex flex-col items-center">
+              <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} className="w-72 h-6 accent-uktena-violet hover:bg-uktena-light-red" />
+              <span>Valor del Slider: {sliderValue}</span>
+            </div>
+
+          </div>
+
         </div>
-
-        <div className="canvas">
-          <Canvas ref={canvasRef} style={{ width: '1500px', height: '700px', background: "black" }} className="cursor-pointer" frameloop="always" shadows camera={{ position: [-4, 3, 6], fov: 75, near: 0.1, far: 200 }}>
-            <Scene ref={sceneComponentRef} onNodesLoaded={handleNodesLoaded} setSliderValue={setSliderValue} sliderValue={sliderValue} keyframes={keyframes}
-              setKeyframes={setKeyframes}
-              playAnimation={playAnimation} />
-          </Canvas>
-
-        </div>
-
-      </div>
-
-      <div className="inputs">
-
-        <div className="slider">
-
-          <input type="range" min="22" max="250" value={sliderValue} onChange={handleSliderChange} style={{ width: '300px', height: '25px' }} />
-          <span>Valor del Slider: {sliderValue}</span>
-
-        </div>
-
       </div>
 
     </div>
